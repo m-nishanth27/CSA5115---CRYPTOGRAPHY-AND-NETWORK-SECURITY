@@ -1,0 +1,51 @@
+
+======================================================================
+STRATEGY A - Conventional Public Key Security (RSA only)
+======================================================================
+
+[Key Generation] 2048-bit RSA key pair generated.
+[Original Message] TXN: Acc4471 -> Acc9902; Amount=250000.00; Ref=INV20981
+[Ciphertext] 4b2fe2029662156d7bec8a2dba15b9d164e70597e7307a3767b695b0802c35f1... (256 bytes)
+[Decrypted Message] TXN: Acc4471 -> Acc9902; Amount=250000.00; Ref=INV20981
+[Match Original?] True
+[Attack Test] OAEP padding check failed on tamper: ValueError
+  -> Note: this only detects gross corruption; RSA-OAEP alone still
+     provides NO sender authentication and NO non-repudiation.
+
+======================================================================
+STRATEGY B - Secure Key Establishment (RSA + DH + Hash)
+======================================================================
+
+[DH Parameters] 2048-bit DH group generated (shared publicly).
+[DH Exchange] Shared secrets match: True
+[Session Key] 467a8d11133ad64264f3ebd6f1e65452... (32 bytes, derived via HKDF-SHA256)
+[Encrypted Payload] a3e7e539db720d29bd12c5bf8b49d77904f40a0235d0a447369391efe3eaea68...
+[SHA-256 Digest sent alongside payload] 1cc6788adbe9e9e743f3d916fee0e3b2daa9839e1fe3d6b258184c80a1614dc2
+[Receiver Decrypted] TXN: Acc4471 -> Acc9902; Amount=250000.00; Ref=INV20981
+[Integrity OK?] True
+[Attack Test] Tampered message digest:  499be0ccd6333744c0d4581370bd57586ceb0f86d629da8b8b340e592b0785ed
+[Attack Test] Original message digest:  1cc6788adbe9e9e743f3d916fee0e3b2daa9839e1fe3d6b258184c80a1614dc2
+[Attack Test] Tamper detected? True
+  -> Note: a hash alone can be recomputed by ANY party, so this still
+     does not prove WHO sent the message (no authentication yet).
+
+======================================================================
+STRATEGY C - Trusted Cryptographic Security (RSA + DH + Hash + Signature + X.509)
+======================================================================
+
+[CA Certificate] Issued: CN=CN=CSA51 Root CA,O=CSA51-Bank-RootCA,C=IN
+[Branch Certificate] Issued by CA: CN=CN=branch01.csa51bank.local,O=CSA51-Bank-Branch,C=IN
+[Certificate Verification] PASSED - branch certificate is authentic and signed by the trusted CA.
+[Message Signed] Signature (first 32 bytes hex): 31d445e118254fcb1b25e04d6d20669f1e7eec1669d0f07380ad5bdee03f85f7...
+[Signature Verification] PASSED - message is authentic, unaltered, and non-repudiable (sender identity confirmed via certificate).
+
+[Attack Test] Impersonation attempt using an UNCERTIFIED key pair:
+  -> Impersonation DETECTED and REJECTED: signature does not match the certified public key of the claimed sender.
+
+[Attack Test] Message tampered after signing (amount changed):
+  -> Tampering DETECTED and REJECTED: signature does not match the recomputed digest of the modified message.
+
+======================================================================
+END OF DEMONSTRATION
+======================================================================
+
